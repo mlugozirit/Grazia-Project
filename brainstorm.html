@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="ai-feature" content="grazia-project">
+  <title>Grazia Project · Brainstorm</title>
+  <style>
+/* ── {ai} Engineering — the artifact design system ─────────────────────────
+   Tokens are the brand's, at system stacks so an artifact renders offline:
+   one signal green, neutral borders, the reading tint for small green,
+   dark-only. Anything ai-engineering renders as an artifact — spec.html,
+   plan.html, a recap, a research page, a report — inherits this block
+   verbatim.                                                                */
+:root{
+  --bg:#001E2B; --surface:#112733; --surface-2:#1C2D38;
+  --line:rgba(61,79,88,.3); --line-strong:rgba(61,79,88,.6);
+  --accent:#00ED64; --accent-dim:#71F6BA;
+  --text:#FFFFFF; --dim:#C1C7C6; --comment:#889397;
+  --ok:#00ED64; --bad:#FF6960; --warn:#FFC010; --purple:#B45AF2; --orange:#FFC010;
+  --mono:'SF Mono','JetBrains Mono','Fira Code',ui-monospace,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,'Inter',system-ui,sans-serif;
+
+  /* type: one scale, tracking and leading set per size, never one value for all */
+  --fs-display:44px; --lh-display:1.06; --ls-display:-.028em;
+  --fs-h2:26px;      --lh-h2:1.16;      --ls-h2:-.018em;
+  --fs-h3:17px;      --lh-h3:1.32;      --ls-h3:-.006em;
+  --fs-h4:14px;      --lh-h4:1.35;
+  --fs-body:15px;    --lh-body:1.62;
+  --fs-small:13.5px; --lh-small:1.55;
+  --fs-mono:12.5px;  --lh-mono:1.7;
+  --fs-label:10.5px;
+
+  /* space: a 4px rhythm, so nothing lands on an arbitrary number */
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px; --s8:64px;
+  --radius:12px; --radius-sm:8px; --radius-lg:var(--radius); --container:1040px; --measure:68ch;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  background:var(--bg);color:var(--text);font-family:var(--sans);
+  font-size:var(--fs-body);line-height:var(--lh-body);
+  font-synthesis-weight:none;-webkit-font-smoothing:antialiased;
+}
+::selection{background:rgba(0,237,100,.28)}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:3px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+.skip{position:absolute;top:var(--s2);left:var(--s2);z-index:99;background:var(--surface);
+      border:1px solid var(--line-strong);border-radius:var(--radius-sm);padding:13px 20px;
+      transform:translateY(-160%);transition:transform .15s ease-out}
+.skip:focus{transform:none}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+
+/* ── hero ─────────────────────────────────────────────────────────────── */
+.hero{
+  position:relative;overflow:hidden;text-align:center;
+  padding:88px var(--s6) 56px;border-bottom:1px solid var(--line);
+  background-image:
+    linear-gradient(var(--line) 1px,transparent 1px),
+    linear-gradient(90deg,var(--line) 1px,transparent 1px),
+    radial-gradient(ellipse 80% 60% at 50% 0%,#11273366,transparent);
+  background-size:32px 32px,32px 32px,100% 100%;
+}
+.hero .stamp{
+  display:inline-block;font-family:var(--mono);font-size:var(--fs-label);
+  letter-spacing:.26em;text-transform:uppercase;color:var(--accent);
+  border:1px solid var(--line-strong);border-radius:3px;padding:6px 14px;
+  margin-bottom:var(--s5);
+}
+.hero h1{font-size:var(--fs-display);line-height:var(--lh-display);
+         letter-spacing:var(--ls-display);font-weight:740}
+.hero h1 .x{color:var(--accent)}
+.hero .sub{font-size:17px;line-height:1.6;color:var(--dim);max-width:62ch;
+           margin:var(--s4) auto 0}
+.hero .sub strong{color:var(--text);font-weight:620}
+.hero .meta{font-family:var(--mono);font-size:11.5px;line-height:1.6;color:var(--dim);
+            margin:var(--s5) auto 0;max-width:66ch;letter-spacing:.02em}
+.hero .meta b{color:var(--accent-dim);font-weight:500}
+.hero .corner{position:absolute;width:22px;height:22px;border:0 solid var(--accent);opacity:.85}
+.hero .tl{top:18px;left:18px;border-width:2px 0 0 2px}
+.hero .tr{top:18px;right:18px;border-width:2px 2px 0 0}
+.hero .bl{bottom:18px;left:18px;border-width:0 0 2px 2px}
+.hero .br{bottom:18px;right:18px;border-width:0 2px 2px 0}
+
+/* ── nav: translucent chrome, content scrolls under it ────────────────── */
+nav{
+  position:sticky;top:0;z-index:50;
+  display:flex;flex-wrap:wrap;justify-content:center;gap:2px 4px;
+  padding:var(--s2) var(--s4);
+  background:rgba(0,30,43,.78);backdrop-filter:blur(14px) saturate(150%);
+  border-bottom:1px solid var(--line);
+  font-family:var(--mono);font-size:11px;
+}
+nav a{color:var(--dim);letter-spacing:.03em;padding:6px 9px;border-radius:999px;
+      white-space:nowrap;transition:color .15s,background .15s}
+nav a:hover{color:var(--accent);text-decoration:none;background:rgba(0,237,100,.06)}
+nav a.active{color:var(--accent);background:rgba(0,237,100,.1);font-weight:600}
+nav a b{color:var(--accent);font-weight:500;margin-right:5px;opacity:.75}
+nav a.active b{opacity:1}
+
+/* ── page ─────────────────────────────────────────────────────────────── */
+.container{max-width:var(--container);margin:0 auto;padding:0 var(--s5)}
+section{padding:56px 0 44px;border-bottom:1px solid var(--line);scroll-margin-top:88px}
+section:last-of-type{border-bottom:none}
+h2{font-size:var(--fs-h2);line-height:var(--lh-h2);letter-spacing:var(--ls-h2);font-weight:700}
+h2 .num{display:block;font-family:var(--mono);font-size:11px;font-weight:400;
+        letter-spacing:.22em;color:var(--accent);margin-bottom:var(--s2)}
+h3{font-size:var(--fs-h3);line-height:var(--lh-h3);letter-spacing:var(--ls-h3);
+   font-weight:660;margin:var(--s5) 0 var(--s3)}
+h4{font-size:var(--fs-h4);line-height:var(--lh-h4);font-weight:640}
+h2+p,h3+p,h3+div,h2+div{margin-top:var(--s3)}
+p{color:var(--dim);margin:0 auto var(--s3);text-align:justify;hyphens:auto}
+p:last-child{margin-bottom:0}
+p strong,li strong{color:var(--text);font-weight:620}
+ul{margin:var(--s3) 0 var(--s5) var(--s5)}
+ol{margin:var(--s3) 0 var(--s5);text-align:left;list-style:none;padding-left:0;counter-reset:ref}
+li{color:var(--dim);font-size:14px;line-height:1.6;margin-bottom:var(--s3);padding-left:var(--s2)}
+ol li{counter-increment:ref;padding-left:2.4em;position:relative}
+ol li::before{content:counter(ref) ".";position:absolute;left:0;color:var(--comment);font-family:var(--mono);font-size:12px;width:2em;text-align:right}
+.dim{color:var(--comment)}
+
+/* ── code ─────────────────────────────────────────────────────────────── */
+code{font-family:var(--mono);font-size:var(--fs-mono);background:var(--surface-2);
+     border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:var(--accent-dim);
+     overflow-wrap:anywhere}
+pre{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius-lg);
+    padding:var(--s4) var(--s5);overflow-x:auto;font-family:var(--mono);
+    font-size:var(--fs-mono);line-height:var(--lh-mono);color:var(--dim);margin:var(--s4) 0;
+    -webkit-overflow-scrolling:touch}
+pre code{background:none;border:none;padding:0;color:inherit;overflow-wrap:normal}
+pre,.flow,.tbl-wrap{scrollbar-color:var(--line-strong) transparent;scrollbar-width:thin}
+pre::-webkit-scrollbar,.flow::-webkit-scrollbar,.tbl-wrap::-webkit-scrollbar{height:8px;width:8px}
+pre::-webkit-scrollbar-thumb,.flow::-webkit-scrollbar-thumb,.tbl-wrap::-webkit-scrollbar-thumb{
+  background:var(--line-strong);border-radius:99px}
+pre::-webkit-scrollbar-track,.flow::-webkit-scrollbar-track,.tbl-wrap::-webkit-scrollbar-track{background:transparent}
+pre .c{color:var(--comment)} pre .k{color:var(--accent)} pre .s{color:var(--ok)}
+pre .t{color:var(--purple)} pre .n{color:var(--orange)} pre .b{color:var(--text);font-weight:600}
+.flow{white-space:pre;font-size:12px;line-height:1.75;overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+/* ── panels ───────────────────────────────────────────────────────────── */
+.bracket{position:relative;border:1px solid var(--line);background:var(--surface-2);
+         border-radius:var(--radius-lg);padding:var(--s5) var(--s5) var(--s4);margin:var(--s5) 0}
+.bracket::before,.bracket::after{content:'';position:absolute;width:14px;height:14px;
+         border:0 solid var(--accent)}
+.bracket::before{top:-1px;left:-1px;border-width:2px 0 0 2px}
+.bracket::after{bottom:-1px;right:-1px;border-width:0 2px 2px 0}
+.bracket>.tag{position:absolute;top:-9px;left:18px;background:var(--bg);padding:0 10px;
+         font-family:var(--mono);font-size:var(--fs-label);letter-spacing:.22em;
+         text-transform:uppercase;color:var(--accent)}
+.bracket pre{margin:0;border:none;background:none;padding:0}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);
+      padding:var(--s5);display:flex;flex-direction:column;gap:var(--s2)}
+.card h3,.card h4{display:flex;align-items:flex-start;gap:var(--s2)}
+.card h3,.card h4{min-height:22px;line-height:22px}
+.card h3{font-size:var(--fs-h4);line-height:var(--lh-h4);font-weight:640;margin:0}
+.card p{font-size:var(--fs-small);line-height:var(--lh-small);margin:0}
+.card .src{font-family:var(--mono);font-size:11px;color:var(--comment)}
+.card pre{font-size:12px;line-height:1.6;margin:var(--s2) 0 0}
+
+.note{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);
+      padding:var(--s5);margin:var(--s5) 0}
+.note h3,.note h4{font-family:var(--mono);font-size:var(--fs-label);letter-spacing:.18em;
+         text-transform:uppercase;color:var(--accent-dim);margin:0 0 var(--s3)}
+.note p{font-size:var(--fs-small);line-height:var(--lh-small);margin:0;text-align:left}
+.note.ok{border-color:rgba(0,237,100,.3)} .note.ok h4{color:var(--ok)}
+.note.warn{border-color:rgba(255,192,16,.3)} .note.warn h4{color:var(--warn)}
+.note.danger{border-color:rgba(255,105,96,.3)} .note.danger h4{color:var(--bad)}
+
+.grid{display:grid;gap:var(--s3);margin:var(--s5) 0;align-items:stretch}
+.grid>*{min-width:0}
+pre{max-width:100%}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.stats{display:flex;gap:var(--s3);flex-wrap:wrap;justify-content:center;margin:var(--s5) 0}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);
+      padding:var(--s4) var(--s5);min-width:132px;text-align:center}
+.stat .v{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--text)}
+.stat .v em{font-style:normal;color:var(--accent)}
+.stat .l{font-family:var(--mono);font-size:var(--fs-label);letter-spacing:.14em;
+         text-transform:uppercase;color:var(--dim);margin-top:var(--s1)}
+
+/* ── tables: a component, not a spill ─────────────────────────────────── */
+.tbl-wrap{border:1px solid var(--line);border-radius:var(--radius-lg);background:var(--surface-2);
+          overflow-x:auto;-webkit-overflow-scrolling:touch;margin:var(--s4) 0}
+table{width:100%;border-collapse:collapse;font-size:var(--fs-small)}
+th{text-align:left;padding:12px var(--s4) 10px;white-space:nowrap;
+   font-family:var(--mono);font-size:var(--fs-label);letter-spacing:.12em;
+   text-transform:uppercase;color:var(--accent);border-bottom:1px solid var(--line-strong)}
+td{padding:13px var(--s4);border-bottom:1px solid var(--line);color:var(--dim);
+   vertical-align:top;line-height:var(--lh-small)}
+tr:last-child td{border-bottom:none}
+td:first-child{color:var(--text);font-weight:520}
+@media (hover:hover) and (pointer:fine){tbody tr:hover td{background:rgba(17,39,51,.35)}}
+td code{overflow-wrap:normal;word-break:keep-all}
+table{min-width:640px}
+
+/* ── pills, marks ─────────────────────────────────────────────────────── */
+.pill{display:inline-block;font-family:var(--mono);font-size:10px;line-height:1.5;font-weight:600;
+      padding:2px 8px;border-radius:999px;letter-spacing:.05em;white-space:nowrap;color:var(--text)}
+.p-ok{background:rgba(0,237,100,.13);border:1px solid rgba(0,237,100,.32)}
+.p-bad{background:rgba(255,105,96,.13);border:1px solid rgba(255,105,96,.34)}
+.p-warn{background:rgba(255,192,16,.12);border:1px solid rgba(255,192,16,.32)}
+.p-fix{background:rgba(0,237,100,.1);border:1px solid rgba(0,237,100,.35)}
+.p-dim{background:rgba(17,39,51,.6);color:var(--dim);border:1px solid var(--line)}
+.check{color:var(--ok);font-weight:600} .cross{color:var(--bad);font-weight:600}
+.half{color:var(--warn);font-weight:600} .center{text-align:center}
+.btn{display:inline-block;border:1px solid rgba(0,237,100,.35);border-radius:999px;padding:8px 18px;margin:var(--s2) 0;color:var(--accent);font-family:var(--mono);font-size:12px;text-decoration:none;transition:background .15s}
+.btn:hover{background:rgba(0,237,100,.08);text-decoration:none}
+
+/* ── pipeline: real boxes, not ASCII ─────────────────────────────────── */
+.pipe{display:flex;align-items:stretch;margin:var(--s5) 0;flex-wrap:wrap;gap:0}
+.pipe .stage{flex:1 1 150px;min-width:0;background:var(--surface);
+             border:1px solid var(--line);padding:var(--s3) var(--s4) var(--s3)}
+.pipe .stage:first-child{border-radius:var(--radius-lg) 0 0 var(--radius-lg)}
+.pipe .stage:last-child{border-radius:0 var(--radius-lg) var(--radius-lg) 0}
+.pipe .stage+.stage{border-left:none}
+.pipe .stage::after{content:'▸';position:absolute;right:-6px;top:50%;transform:translateY(-50%);
+                    color:var(--accent);font-size:13px;z-index:2}
+.pipe .stage{position:relative}
+.pipe .stage:last-child::after{content:''}
+.pipe .ph{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+.pipe .sk{font-family:var(--mono);font-size:12px;color:var(--text);margin-top:var(--s2);line-height:1.5}
+.pipe .q{font-size:11.5px;color:var(--dim);margin-top:var(--s1)}
+
+.tiers{display:flex;flex-direction:column;gap:var(--s2);margin:var(--s5) 0}
+.tier{display:flex;gap:var(--s4);align-items:baseline;border:1px solid var(--line);
+      border-radius:var(--radius-lg);padding:var(--s3) var(--s4);background:var(--surface);flex-wrap:wrap}
+.tier .tname{font-family:var(--mono);font-size:11px;letter-spacing:.08em;min-width:148px;
+             color:var(--accent);text-transform:uppercase}
+.tier .tbody{flex:1 1 240px;font-size:var(--fs-small);color:var(--dim);min-width:0}
+.tier .tbody b{color:var(--text)}
+.tier .tlat{font-family:var(--mono);font-size:11px;color:var(--warn);text-align:right}
+/* ── items: the expandable row, and the band chip that ranks it ───────── */
+.band{display:inline-block;font-family:var(--mono);font-size:10px;line-height:1.5;font-weight:700;padding:2px 8px;border-radius:999px;letter-spacing:.08em;white-space:nowrap;color:var(--text);border:1px solid transparent}
+.band-p0{background:rgba(255,105,96,.16);border-color:rgba(255,105,96,.46)}
+.band-p1{background:rgba(255,192,16,.14);border-color:rgba(255,192,16,.44)}
+.band-p2{background:rgba(0,237,100,.12);border-color:rgba(0,237,100,.36)}
+.band-p3,.band-p4,.band-p5{background:rgba(17,39,51,.6);border-color:var(--line);color:var(--dim)}
+.items{display:flex;flex-direction:column;gap:var(--s2);margin:var(--s5) 0}
+.item{border:1px solid var(--line);border-radius:var(--radius-lg);background:var(--surface)}
+.item>summary{display:flex;align-items:baseline;gap:var(--s3);flex-wrap:wrap;padding:var(--s3) var(--s4);cursor:pointer;list-style:none;border-radius:var(--radius-lg)}
+.item>summary::-webkit-details-marker{display:none}
+.item>summary::after{content:'+';font-family:var(--mono);font-size:13px;line-height:1;color:var(--comment)}
+.item[open]>summary::after{content:'\2013'}
+.item[open]>summary{border-bottom:1px solid var(--line);border-radius:var(--radius-lg) var(--radius-lg) 0 0}
+.item>summary:hover{background:rgba(17,39,51,.35)}
+.item .iid{font-family:var(--mono);font-size:12px;font-weight:600;white-space:nowrap}
+.item .ititle{flex:1 1 300px;min-width:0;font-size:var(--fs-small);line-height:var(--lh-small);color:var(--text);font-weight:520}
+.item .imeta{font-family:var(--mono);font-size:11px;color:var(--warn);white-space:nowrap}
+.item .ibody{padding:var(--s3) var(--s4) var(--s4);display:grid;gap:var(--s2)}
+.kv{display:grid;grid-template-columns:128px minmax(0,1fr);gap:var(--s3);align-items:baseline}
+.kv>span{font-size:var(--fs-small);line-height:var(--lh-small);color:var(--dim);text-align:left}
+.ilbl{font-family:var(--mono);font-size:var(--fs-label);letter-spacing:.18em;text-transform:uppercase;color:var(--accent-dim)}
+.xref{font-family:var(--mono);font-size:10.5px;color:var(--comment)}
+.xref a{color:var(--comment);text-decoration:underline;text-underline-offset:2px}
+.xref a:hover{color:var(--accent);text-decoration:none}
+.sig{display:flex;gap:var(--s3);flex-wrap:wrap;font-family:var(--mono);font-size:10.5px;color:var(--comment)}
+.sig b{color:var(--dim);font-weight:500}
+.legend{display:grid;gap:var(--s2);border:1px solid var(--line);border-radius:var(--radius-lg);background:var(--surface);padding:var(--s5);margin:var(--s5) 0}
+.legend>div{display:flex;gap:var(--s3);align-items:baseline;flex-wrap:wrap}
+.legend .lname{min-width:104px}
+.legend p{margin:0}
+.hero .mark{display:flex;width:44px;height:44px;align-items:center;justify-content:center;margin:0 auto var(--s4);border:1px solid var(--line-strong);border-radius:var(--radius-sm);background:var(--surface);font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text);letter-spacing:-.04em}
+.hero .mark .x{color:var(--accent)}
+@media (max-width:700px){.kv{grid-template-columns:1fr;gap:var(--s1)}}
+
+footer{text-align:center;padding:var(--s7) var(--s5) var(--s6);
+       border-top:1px solid var(--line);font-family:var(--mono);font-size:11px;
+       color:var(--comment);letter-spacing:.08em;line-height:2.1}
+footer .x{color:var(--accent)}
+footer a{color:var(--dim);display:inline-block;padding:12px 4px}
+
+@media (max-width:900px){
+  .g2,.g3,.g4{grid-template-columns:1fr}
+  .hero{padding:64px var(--s5) 44px}
+  .hero h1{font-size:34px;letter-spacing:-.022em}
+  .hero .sub{font-size:16px}
+  .pipe .stage{border-left:1px solid var(--line);border-radius:var(--radius-lg)!important;flex-basis:100%}
+  .pipe .stage+.stage{margin-top:var(--s2)}
+  .pipe .stage::after{content:''}
+  .tier .tlat{text-align:left}
+}
+@media (max-width:820px){
+  nav a{padding:14px 8px}
+}
+@media (max-width:560px){
+  .container{padding:0 var(--s4)}
+  nav{font-size:10.5px;gap:0 2px;flex-wrap:nowrap;justify-content:flex-start;
+      overflow-x:auto;scrollbar-width:none}
+  nav::-webkit-scrollbar{display:none}
+  nav::after{content:'';position:sticky;right:0;flex:0 0 28px;margin-left:-28px;
+      background:linear-gradient(90deg,transparent,rgba(0,30,43,.95));pointer-events:none}
+  nav a{padding:14px 8px}
+  table{font-size:13px} th,td{padding:10px var(--s3)}
+  pre{font-size:11.5px;padding:var(--s3) var(--s4)}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *{animation:none!important;transition:none!important}
+}
+@media (prefers-reduced-transparency:reduce){
+  nav{background:var(--bg);backdrop-filter:none}
+}
+@media (prefers-contrast:more){
+  :root{--dim:#E8EDEB;--comment:#C1C7C6}
+  .card,.note,p,li,td{color:var(--dim)}
+  nav a{color:#E8EDEB}
+}
+@media print{
+  nav,.skip{display:none}
+  body{background:#fff;color:#111}
+  section{page-break-inside:avoid}
+}
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <span class="corner tl" aria-hidden="true"></span><span class="corner tr" aria-hidden="true"></span>
+    <span class="corner bl" aria-hidden="true"></span><span class="corner br" aria-hidden="true"></span>
+    <div class="mark">{<span class="x">ai</span>}</div>
+    <div class="stamp">Brainstorm · Grazia Project</div>
+    <h1>Grazia Project</h1>
+    <p class="sub">Grazia ayuda a personas recién graduadas y a profesionales que quieren encontrar o cambiar su rumbo laboral. El test recoge sus intereses y habilidades; la creadora define con cada persona qué roles y ruta encajan durante una conversación. La primera versión será una demo en Angular; el backend llegará después.</p>
+    <p class="meta"><b>draft · interview in progress</b></p>
+  </header>
+  <nav aria-label="Secciones del documento">
+    <a href="#idea"><b>01</b>Idea</a><a href="#why"><b>02</b>Motivo</a>
+    <a href="#users"><b>03</b>Usuarios</a><a href="#today"><b>04</b>Hoy</a>
+    <a href="#success"><b>05</b>Éxito</a><a href="#decided"><b>06</b>Decidido</a>
+    <a href="#open"><b>07</b>Abierto</a><a href="#constraints"><b>08</b>Límites</a>
+    <a href="#scope"><b>09</b>Fuera</a><a href="#research"><b>10</b>Investigar</a>
+    <a href="#handoff"><b>11</b>Entrega</a>
+  </nav>
+  <main id="main" class="container">
+    <section id="idea">
+      <h2><span class="num">01</span>La idea en palabras sencillas</h2>
+      <p>Grazia ayuda a personas recién graduadas y a profesionales que se sienten perdidos, quieren entender cómo aprovechar su experiencia o desean cambiar de carrera o sector. El test recoge intereses y habilidades, pero no intenta enumerar todos los roles posibles. La creadora conversa y entrevista a cada persona para definir qué roles y ruta tienen sentido. La primera versión será una demo Angular con datos de prueba; más adelante se conectará a un backend en .NET y SQL Server.</p>
+    </section>
+    <section id="why">
+      <h2><span class="num">02</span>Por qué importa</h2>
+      <p>Al terminar una carrera, algunas personas están preparadas en su profesión, pero no saben qué camino seguir dentro de su sector. Pueden postularse a muchos puestos sin una dirección clara y no saber cómo armar su currículum ni prepararse para buscar trabajo. La creadora vivió esa falta de orientación y acompañamiento, y quiere que otras personas tengan una guía durante ese proceso.</p>
+    </section>
+    <section id="users">
+      <h2><span class="num">03</span>Para quién es</h2>
+      <p>Grazia se dirige tanto a personas jóvenes recién graduadas que buscan su camino como a profesionales con experiencia que no saben cómo aprovecharla o quieren cambiar de carrera o sector. La creadora de Grazia administra la plataforma y ofrece talleres o sesiones.</p>
+      <p>TODO: concretar edades y si también incluye a personas que aún estudian.</p>
+    </section>
+    <section id="today">
+      <h2><span class="num">04</span>Qué existe hoy</h2>
+      <p>La idea y el alcance por fases vienen de la creadora. La fase 1 es el frontend del TFG que se presentará al instituto para que apruebe el proyecto antes de abordar el backend. El repositorio actual contiene configuración de {ai} Engineering, decisiones e integración continua, pero no se encontraron archivos de aplicación ni un manifiesto de Angular en la raíz revisada.</p>
+      <p>La creadora todavía no tiene las preguntas del test; habrá que definirlas. TODO: confirmar si ya existen diseños, materiales de marca u otros recursos fuera de este repositorio.</p>
+    </section>
+    <section id="success">
+      <h2><span class="num">05</span>Qué significa que funcione</h2>
+      <p>Al terminar el trabajo con la creadora, una persona debería descubrir caminos o roles de su sector que no conocía, definir una dirección laboral que encaje con sus intereses y habilidades, y salir con entre tres y cinco pasos concretos, como adaptar su currículum, mejorar LinkedIn o preparar una entrevista. También debería sentirse con más seguridad para empezar a buscar trabajo.</p>
+      <p>Para el 20 de noviembre de 2026 debe haber una demo Angular funcional con registro e inicio de sesión simulados, test, reserva de una cita con la creadora después del test, acceso de administración y creación de rutas individuales después de la conversación. El instituto debe poder recorrerla, entender para qué sirve y decidir si aprueba que se siga trabajando en ella. No es la presentación de un producto terminado.</p>
+    </section>
+    <section id="decided">
+      <h2><span class="num">06</span>Decisiones ya tomadas</h2>
+      <div class="note ok"><h4>Fase 1</h4><p>Solo Angular y datos de prueba. Incluye inicio, registro e inicio de sesión simulados, test con resumen de intereses y habilidades, reserva de una cita con la creadora después del test y una vista sencilla para que la creadora asigne a cada cuenta una ruta individual de 3 a 5 acciones después de conversar con la persona. La persona puede marcar las acciones como completadas. La demo no depende de un backend real.</p></div>
+      <div class="note ok"><h4>Fase 2</h4><p>El backend llegará después, cuando se estudie en clase a partir de enero. La tecnología prevista es .NET y SQL Server.</p></div>
+      <div class="note ok"><h4>Primera presentación académica</h4><p>El 20 de noviembre de 2026 se presentará una demo Angular funcional con registro e inicio de sesión simulados, test, acceso de administración y creación de rutas individuales. El instituto decidirá si aprueba que la creadora siga trabajando en el proyecto; no se presenta un producto terminado.</p></div>
+      <div class="note ok"><h4>Demo para la aprobación</h4><p>El instituto recorrerá el flujo funcional y verá para qué sirve la app, incluido el resumen del test para ambas partes y una ruta individual.</p></div>
+      <div class="note ok"><h4>Enfoque del test</h4><p>Inspirado en RIASEC de Holland para explorar intereses y habilidades laborales. No será una evaluación psicológica ni de personalidad.</p></div>
+      <div class="note ok"><h4>Cuestionario provisional</h4><p>Las preguntas del test pueden ser provisionales en la demo de aprobación y revisarse más adelante.</p></div>
+      <div class="note ok"><h4>Test y conversación</h4><p>El test prepara un resumen de intereses y habilidades. La creadora trabaja con cada persona para definir qué rol profesional tiene sentido; la aplicación no recomienda puestos por su cuenta ni pretende listar todos los roles.</p></div>
+      <div class="note ok"><h4>Quién ve el resumen</h4><p>Al terminar el test, el resumen de intereses y habilidades se mostrará tanto a la persona joven como a la creadora.</p></div>
+      <div class="note ok"><h4>Contenido del resumen</h4><p>El resumen reflejará los intereses y habilidades que la persona expresó en sus respuestas. No dará una puntuación ni asignará una etiqueta de tipo RIASEC.</p></div>
+      <div class="note ok"><h4>Acciones de la ruta</h4><p>La ruta de la fase 1 tendrá entre tres y cinco acciones concretas, y la persona podrá marcar cuáles completó.</p></div>
+      <div class="note ok"><h4>Progreso en fase 1</h4><p>El checklist de acciones dentro de la ruta es suficiente para mostrar el avance. No hace falta un panel de progreso separado para la demo.</p></div>
+      <div class="note ok"><h4>Ruta individual</h4><p>Cada persona tendrá una ruta creada para su caso; no se usará una única ruta genérica para todos.</p></div>
+      <div class="note ok"><h4>Administración mínima</h4><p>La fase 1 tendrá una vista sencilla para que la creadora escriba y asigne acciones de ruta a cada cuenta de prueba.</p></div>
+      <div class="note ok"><h4>Contenido de la ruta</h4><p>En fase 1 cada acción tendrá un nombre y se podrá marcar como completada. Las guías y recursos, como consejos para mejorar LinkedIn, se añadirán más adelante.</p></div>
+      <div class="note ok"><h4>Datos de prueba</h4><p>La información de prueba del usuario, su test, su cita, su ruta y el avance deben conservarse en el navegador hasta que se incorpore el backend.</p></div>
+      <div class="note ok"><h4>Datos JSON y cambios</h4><p>Angular consultará datos JSON de ejemplo. Las rutas que cree la administradora y el avance de las personas se guardarán localmente en el navegador, porque la demo no tiene backend.</p></div>
+      <div class="note ok"><h4>Enfoque técnico de fase 1</h4><p>Una aplicación Angular carga datos de ejemplo desde JSON y guarda los cambios en el navegador. La lógica de datos se mantendrá separada de las pantallas para poder conectarla más adelante al backend .NET sin rehacer el flujo.</p></div>
+      <div class="note ok"><h4>Datos ficticios</h4><p>La demo usará solo cuentas y respuestas inventadas, no datos reales de jóvenes.</p></div>
+      <div class="note ok"><h4>Acceso de administración</h4><p>La demo tendrá una cuenta de prueba de administración separada del acceso de los jóvenes; no será seguridad real ni usará backend.</p></div>
+      <div class="note ok"><h4>Reserva en la demo</h4><p>Después de completar el test y ver su resumen, la persona elegirá un horario de prueba para una cita individual con la creadora y verá una confirmación dentro de la demo. No se conectará un calendario externo ni se enviarán notificaciones reales. La inscripción a talleres queda para más adelante.</p></div>
+      <div class="note ok"><h4>Visión de producto</h4><p>Grazia es una plataforma de orientación y acompañamiento, no solo una consultora. Beacons.ai es una referencia, pero la identidad de Grazia debe ser propia y no copiar su diseño.</p></div>
+      <div class="note ok"><h4>Preferencia visual inicial</h4><p>La identidad debe usar las iniciales GP, tonos lilas y un estilo minimalista y profesional que transmita confianza, cercanía y acompañamiento humano. Aún no existe un diseño de marca.</p></div>
+      <div class="note ok"><h4>Temas visuales</h4><p>La persona usuaria quiere ofrecer tanto un tema claro como uno oscuro.</p></div>
+    </section>
+    <section id="open">
+      <h2><span class="num">07</span>Decisiones todavía abiertas</h2>
+      <div class="note warn"><h4>Recomendación inicial</h4><p>Decidir primero qué recorrido completo debe poder enseñar la fase 1. Luego ajustar la navegación y los extras alrededor de ese recorrido, para que la demo no se disperse.</p></div>
+      <ul>
+        <li><strong>Contenido del test:</strong> para la demo del 20 de noviembre el cuestionario será provisional. Aún hay que crear sus preguntas y definir cómo resumir intereses y habilidades sin diagnosticar ni recomendar puestos automáticamente.</li>
+        <li><strong>Resumen del test:</strong> la persona y la creadora lo verán. Mostrará intereses y habilidades expresados en las respuestas, sin puntuación ni etiqueta RIASEC; falta definir las preguntas y cómo agrupar respuestas.</li>
+        <li><strong>Inspiración de Beacons.ai:</strong> falta concretar qué aspecto de esa propuesta inspira el producto, aparte de servir como referencia, sin copiar su diseño.</li>
+        <li><strong>Horarios de cita:</strong> falta decidir qué horarios de ejemplo se muestran. Recomendación: unos pocos horarios futuros precargados para la demo.</li>
+      </ul>
+    </section>
+    <section id="constraints">
+      <h2><span class="num">08</span>Restricciones y protecciones</h2>
+      <ul>
+        <li>Angular es la tecnología del frontend de la fase 1.</li>
+        <li>La primera fase usa datos de prueba, prioriza el recorrido test-conversación-ruta y no depende del backend. Incluye solo la administración mínima para asignar rutas individuales.</li>
+        <li>Los datos de prueba del usuario, el resultado del test y sus pasos completados se conservan en el navegador hasta incorporar el backend.</li>
+        <li>Solo se usarán cuentas, perfiles y respuestas ficticias en la demo, no información real de participantes.</li>
+        <li>El backend futuro está previsto en .NET y SQL Server, después de que se estudien en clase a partir de enero.</li>
+        <li>El test orienta sobre intereses y habilidades de trabajo, sin diagnosticar ni evaluar la personalidad.</li>
+        <li>La primera entrega para el instituto es el 20 de noviembre de 2026.</li>
+        <li>TODO: disponibilidad, requisitos académicos y límites de privacidad.</li>
+      </ul>
+    </section>
+    <section id="scope">
+      <h2><span class="num">09</span>Fuera de alcance</h2>
+      <div class="note danger"><h4>No en fase 1</h4><p>Implementar y desplegar el backend real en .NET o conectar SQL Server, usar cuentas o respuestas reales, conectar un calendario externo, enviar notificaciones reales, inscribir a talleres o crear una biblioteca completa de recursos.</p></div>
+      <p>El test no debe presentarse como una evaluación psicológica o de personalidad.</p>
+      <p>TODO: confirmar otras exclusiones, por ejemplo pagos, mensajería, publicación de ofertas o integración con empresas.</p>
+    </section>
+    <section id="research">
+      <h2><span class="num">10</span>Preguntas abiertas para investigar</h2>
+      <ol>
+        <li>Qué fechas de entrega del TFG condicionan el alcance de la fase 1 y su presentación al instituto.</li>
+        <li>Qué elementos de RIASEC se pueden usar como inspiración para preguntas de intereses laborales no clínicas, y qué avisos evitan confundir el resultado con una evaluación psicológica.</li>
+        <li>Qué materiales, preguntas, rutas laborales y contenidos de orientación existen ya y pueden usarse.</li>
+      </ol>
+    </section>
+    <section id="handoff">
+      <h2><span class="num">11</span>Notas para el siguiente paso</h2>
+      <h3>Arquitectura propuesta</h3>
+      <p>La fase 1 será una aplicación Angular de una sola página. Leerá los datos iniciales de archivos JSON incluidos con la app. Las cuentas simuladas, los resultados, las citas, las rutas y el avance se guardarán en el almacenamiento local del navegador. Las pantallas usarán una capa de datos común, para que en la fase 2 se pueda cambiar la fuente local por la API .NET sin rehacer el recorrido.</p>
+      <h3>Pantallas y partes</h3>
+      <ul>
+        <li><strong>Inicio:</strong> explica a quién ayuda Grazia, para qué sirve y cómo se empieza.</li>
+        <li><strong>Acceso:</strong> registro e inicio de sesión simulados para personas, más una cuenta de prueba separada para la creadora.</li>
+        <li><strong>Recorrido de la persona:</strong> test provisional, resumen descriptivo, selección de horario de prueba y ruta personal con checklist.</li>
+        <li><strong>Vista de administración:</strong> lista de cuentas de prueba, consulta el resumen y la cita, y permite escribir y asignar entre tres y cinco acciones de ruta.</li>
+        <li><strong>Fuera de esta demo:</strong> catálogo completo de recursos, inscripción a talleres, panel avanzado de progreso y servicios reales de calendario o notificación.</li>
+      </ul>
+      <h3>Flujo de datos</h3>
+      <ol>
+        <li>Angular carga desde JSON las preguntas provisionales, los horarios de ejemplo y la cuenta admin de demostración.</li>
+        <li>La persona se registra o inicia sesión, completa el test y ve junto con la creadora un resumen descriptivo de sus respuestas.</li>
+        <li>La persona reserva un horario de prueba; la cita queda guardada en el navegador y el horario deja de aparecer disponible en esa demo.</li>
+        <li>Después de conversar fuera de la app, la creadora busca esa cuenta y guarda su ruta individual.</li>
+        <li>La persona vuelve a su cuenta para ver la ruta y marcar las acciones completadas.</li>
+      </ol>
+      <p class="dim">Los datos locales solo estarán disponibles en el mismo navegador y dispositivo. No se sincronizan entre equipos.</p>
+      <h3>Errores y límites</h3>
+      <ul>
+        <li>Los formularios muestran qué falta corregir y no avanzan si faltan datos obligatorios.</li>
+        <li>Si falla la carga del JSON o el navegador no puede guardar datos, la demo muestra un mensaje claro y no finge que el cambio se guardó.</li>
+        <li>Si otra cuenta ya reservó un horario de prueba, se informa y se ofrecen los horarios que siguen disponibles.</li>
+        <li>El test y la cuenta de administración se identifican como contenido de demostración, sin afirmar que sean una evaluación o seguridad reales.</li>
+      </ul>
+      <h3>Comprobaciones previstas</h3>
+      <ul>
+        <li>Recorrer registro e inicio de sesión de prueba, test y resumen compartido, reserva y confirmación de cita.</li>
+        <li>Comprobar que la creadora puede encontrar la cuenta, consultar sus datos de demo y asignarle entre tres y cinco acciones.</li>
+        <li>Comprobar que la persona ve su ruta, marca pasos y conserva cita, ruta y avance al recargar la misma app en el mismo navegador.</li>
+        <li>Probar campos inválidos, credenciales incorrectas, JSON no disponible y error de guardado local para verificar mensajes claros.</li>
+      </ul>
+      <p>Cuando se apruebe, el siguiente paso es convertir las decisiones cerradas en un plan de construcción por checkpoints. Orden sugerido: recorrido principal de fase 1, reglas del test y sus resultados, persistencia de datos de prueba y luego las pantallas complementarias confirmadas.</p>
+      <p>Hechos del repositorio revisados: el árbol actual incluye <code>.ai-engineering/</code>, <code>.github/</code>, <code>AGENTS.md</code> y <code>DECISIONS.md</code>; no se encontró aún una aplicación Angular en la raíz inspeccionada.</p>
+    </section>
+  </main>
+  <footer><span class="x">{ai}</span> Engineering · Grazia Project · draft, interview in progress</footer>
+  <script>
+/* scroll-spy: mark the nav link for the section in view.
+   Lead matches scroll-margin-top (88px): the highlight flips when the
+   heading clears the sticky nav. */
+(function () {
+  const lead = 88;
+  const links = document.querySelectorAll('nav a[href^="#"]');
+  function updateNav() {
+    let current = "";
+    for (const link of links) {
+      const href = link.getAttribute("href");
+      if (!href) continue;
+      const section = document.getElementById(href.slice(1));
+      if (!section) continue;
+      if (section.getBoundingClientRect().top <= lead) current = href.slice(1);
+    }
+    for (const link of links) {
+      const on = link.getAttribute("href") === "#" + current;
+      link.classList.toggle("active", on);
+      if (on) link.setAttribute("aria-current", "location");
+      else link.removeAttribute("aria-current");
+    }
+  }
+  window.addEventListener("scroll", updateNav, { passive: true });
+  updateNav();
+})();
+  </script>
+</body>
+</html>
