@@ -5,10 +5,10 @@ Desarrollar una aplicación web que ayude a las personas a descubrir sus habilid
 El proyecto busca acompañar a personas que se sienten perdidas o desorientadas en el ámbito laboral, ofreciéndoles orientación para definir sus objetivos profesionales, mejorar su currículum y encontrar nuevas oportunidades.
 
 ## Tecnologías utilizadas
--HTML
--CSS
--JavaScript
--Bootstrap
+- HTML
+- CSS
+- JavaScript
+- Bootstrap
 [Tecnologías adicionales por definir según la volución del proyecto]
 
 ## Alcance inicial
